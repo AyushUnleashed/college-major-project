@@ -46,7 +46,7 @@ def fetch_resume_data(email):
         except OSError as e:
             raise Exception(f"Failed to create directory {generations_folder}: {e}")
 
-    resume_filename = f"{generations_folder}/{email}_resume.txt"
+    resume_filename = f"generations/{email}_resume.txt"
 
     try:
         with open(resume_filename, 'w', encoding='utf-8') as file:
