@@ -5,3 +5,4 @@ cold_email_generator.py
 .idea
 __pycache__/
 generations/*
+serviceAccountKey.json

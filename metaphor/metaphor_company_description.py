@@ -2,12 +2,11 @@ import os
 from dotenv import load_dotenv
 import requests
 import json
-import streamlit as st
 # Load environment variables from the .env file
 load_dotenv()
 
 # Retrieve the Metaphor API key from the environment variables
-METAPHOR_API_KEY = os.getenv("METAPHOR_API_KEY") or st.secrets["METAPHOR_API_KEY"]
+METAPHOR_API_KEY = os.getenv("METAPHOR_API_KEY")
 
 def search_metaphor(company_name: str):
     url = "https://api.metaphor.systems/search"
