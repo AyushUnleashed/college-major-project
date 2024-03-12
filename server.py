@@ -19,6 +19,10 @@ class EmailRequest(BaseModel):
     companyName: str
     userEmail: str
 
+@app.get("/")
+async def health_check():
+    return {"status": "healthy"}
+
 @app.post("/api/generate_email")
 async def generate_email_endpoint(request: EmailRequest):
     generated_email = start_email_generation(request.role, request.companyName, request.userEmail)
