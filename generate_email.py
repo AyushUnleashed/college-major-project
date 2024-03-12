@@ -6,13 +6,14 @@ from api.prompts import BASE_PROMPT,REDUCE_PERSONAL_INFO
 import os
 
 
-def prepare_llm_prompt(user_info: Dict, company_info: str) -> str:
+def prepare_llm_prompt(user_info:str,role:str, company_info: str) -> str:
     # Prepare the prompt for LLM.
     n=150
     # Set the base prompt here or uncomment and use set_system_prompt(BASE_PROMPT) if needed.
     llm_prompt = BASE_PROMPT
     llm_prompt += ""
     llm_prompt += f"\n ---"
+    llm_prompt += f"\nUser's \nrole:{role}"
     llm_prompt += f"\nUser's Details:\n{user_info}"
     llm_prompt += f"\n ---"
     llm_prompt += f"\nCompany's Details:\n{get_top_n_words(company_info, n)}"
@@ -52,21 +53,25 @@ def prepare_llm_prompt_user(user_info: str) -> str:
     llm_prompt += f"\nUser's resume Dump:\n{user_info}"
     return llm_prompt
 
-def generate_email(email, company_info="", company_name="") -> str:
-    # Fetch student and company info
+def generate_email(email,role, company_name) -> str:
+    try:
+        # Fetch student and company info
+        from resume_fetch.fetch_resume_info_from_firebase import fetch_resume_data
+        user_info = fetch_resume_data(email)
+        if user_info is None:
+            raise ValueError(f"No user information found for email: {email}")
 
-    user_info = fetch_user_info_from_email(email)
-    llm_prompt_user = prepare_llm_prompt_user(user_info)
-    user_info = clean_user_info_with_llm(llm_prompt_user)
-    if company_info == "" and company_name != "":
+        llm_prompt_user = prepare_llm_prompt_user(user_info)
+        user_info = clean_user_info_with_llm(llm_prompt_user)
 
         from get_company_description import get_company_info_from_name
         company_info = get_company_info_from_name(company_name)
+        if company_info is None:
+            raise ValueError(f"No company information found for company name: {company_name}")
 
-    if company_info:
         # Prepare llm prompt
-        pre_str = f"company name: {company_name} \n "
-        llm_prompt: str = prepare_llm_prompt(user_info, pre_str + company_info)
+        pre_str = f"company name: {company_name} \n company info: {company_info} \n"
+        llm_prompt: str = prepare_llm_prompt(user_info,role, pre_str)
         print("\n\nllm final prompt ",llm_prompt,"\n\n")
 
         #message = fetch_openai_response(llm_prompt)
@@ -74,8 +79,9 @@ def generate_email(email, company_info="", company_name="") -> str:
         save_message_to_file(message)
 
         return message
-    else:
-        return "Something went wrong "
+    except Exception as e:
+        print(f"An error occurred while generating the email: {e}")
+        return ""
 
 
 def save_message_to_file(message, folder_name="generations", file_name="generated_email.txt"):
@@ -94,5 +100,5 @@ def save_message_to_file(message, folder_name="generations", file_name="generate
 
 
 if __name__ == "__main__":
-    message = generate_email("yogendramanawat@gmail.com","Dashtoon is comic creation company","dashtoon")
+    message = generate_email("ayushyadavcodes@gmail.com","SDE","dashtoon")
     print(message)

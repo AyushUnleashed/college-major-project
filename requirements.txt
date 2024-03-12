@@ -5,3 +5,6 @@ openai
 pypdf2
 google-generativeai
 typing
+firebase_admin
+fastapi
+uvicorn

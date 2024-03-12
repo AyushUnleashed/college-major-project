@@ -3,7 +3,6 @@ import openai
 from dotenv import find_dotenv, load_dotenv
 from api.prompts import BASE_PROMPT
 from api.openai_utils import cost_calculator, MODEL_GPT_4, MODEL_GPT_35_TURBO
-import streamlit as st
 # Load environment variables from the root .env file
 root_env_path = find_dotenv()
 load_dotenv(root_env_path)
@@ -17,8 +16,7 @@ def set_system_prompt(NEW_PROMPT):
     global chat_history
     chat_history = [{"role": "system", "content": NEW_PROMPT}]
 
-openai.api_key = os.getenv("OPEN_AI_API_KEY") or st.secrets["OPEN_AI_API_KEY"]
-
+openai.api_key = os.getenv("OPEN_AI_API_KEY")
 
 def fetch_openai_response(user_prompt: str):
     try:
